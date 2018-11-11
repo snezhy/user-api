@@ -1,15 +1,18 @@
 const expect = require("expect");
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {User} = require('./../models/user');
 
 const users = [{
+    _id: new ObjectID(),
     email: 'email_one@test.com',
     firstName: 'FirstNameOne',
     lastName: 'LastNameOne',
     address: "1 Dream Lane"
 }, {
+    _id: new ObjectID(),
     email: 'email_two@test.com',
     firstName: 'FirstNameTwo',
     lastName: 'LastNameTwo',
@@ -86,4 +89,39 @@ describe('GET /users', () => {
             })
             .end(done);
     });
+});
+
+describe('GET /users/:id', () => {
+    it("should return user doc", (done) => {
+        request(app)
+            .get(`/users/${users[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.user.email).toBe(users[0].email);
+                expect(res.body.user.firstName).toBe(users[0].firstName);
+                expect(res.body.user.lastName).toBe(users[0].lastName);
+                expect(res.body.user.address).toBe(users[0].address);
+            })
+            .end(done);
+    });
+
+
+// TODO: check why the following fails
+    it('should return 404 if user not found', (done) => {
+        let hexId = new ObjectID().toHexString();
+    
+        request(app)
+          .get(`/users/${hexId}`)
+          .expect(404)
+          .end(done);
+      });
+
+
+    it("should return 404 for non-object id", (done) => {
+
+        request(app)
+        .get('/users/123')
+        .expect(404)
+        .end(done);
+    })
 });
