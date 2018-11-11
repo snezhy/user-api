@@ -4,9 +4,24 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {User} = require('./../models/user');
 
+const users = [{
+    email: 'email_one@test.com',
+    firstName: 'FirstNameOne',
+    lastName: 'LastNameOne',
+    address: "1 Dream Lane"
+}, {
+    email: 'email_two@test.com',
+    firstName: 'FirstNameTwo',
+    lastName: 'LastNameTwo',
+    address: "2 Dream Lane"
+}];
+
 beforeEach((done) => {
-    User.deleteMany({}).then(() => done());
+    User.deleteMany({}).then(() => {
+      return User.insertMany(users);
+    }).then(() => done());
 });
+   
 
 describe('POST /users', () => {
     it("should create a new user", (done) => {
@@ -30,7 +45,7 @@ describe('POST /users', () => {
                     return done(err);
                 }
 
-                User.find().then((users) => {
+                User.find({email}).then((users) => {
                     expect(users.length).toBe(1);
                     expect(users[0].email).toBe(email);
                     expect(users[0].firstName).toBe(firstName);
@@ -54,9 +69,21 @@ describe('POST /users', () => {
                 }
 
                 User.find().then((users) => {
-                    expect(users.length).toBe(0);
+                    expect(users.length).toBe(2);
                     done();
                 }).catch((e) => done(e))
+            });
+    });
+});
+
+describe('GET /users', () => {
+    it("should get all users", (done) => {
+        request(app)
+            .get('/users')
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.users.length).toBe(2);
             })
+            .end(done);
     });
 });
