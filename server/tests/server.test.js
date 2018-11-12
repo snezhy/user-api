@@ -150,7 +150,7 @@ describe('DELETE /users/:id', () => {
         let hexId = new ObjectID().toHexString();
     
         request(app)
-          .delete(`/users/5be919007cc8be2156b3a773`)
+          .delete(`/users/${hexId}`)
           .expect(404)
           .end(done);
     });
@@ -163,3 +163,26 @@ describe('DELETE /users/:id', () => {
         .end(done);
     });
 });
+
+describe('PATCH /users/:id', () => {
+    it("should update a user", (done) => {
+        let hexId = users[0]._id.toHexString();
+
+        let email = "newtest@test.com";
+        let firstName = "New First Name";
+        let lastName = "New Last Name";
+        let address = "New Address";
+
+        request(app)
+            .patch(`/users/${hexId}`)
+            .send({email, firstName, lastName, address})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.user.email).toBe(email);
+                expect(res.body.user.firstName).toBe(firstName);
+                expect(res.body.user.lastName).toBe(lastName);
+                expect(res.body.user.address).toBe(address);
+            })
+            .end(done);
+    })
+})
