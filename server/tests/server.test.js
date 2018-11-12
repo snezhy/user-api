@@ -38,6 +38,7 @@ describe('POST /users', () => {
             .send({email, firstName, lastName, address})
             .expect(200)
             .expect((res) => {
+                console.log(res);
                 expect(res.body.email).toBe(email);
                 expect(res.body.firstName).toBe(firstName);
                 expect(res.body.lastName).toBe(lastName);

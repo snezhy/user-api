@@ -15,17 +15,19 @@ app.use(bodyParser.json());
 
 app.post('/users', async (req, res) => {
     let user = new User({
-        email: escape(req.body.email),
-        firstName: escape(req.body.firstName),
-        lastName: escape(req.body.lastName),
-        address: escape(req.body.address)
+        email: req.body.email,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        address: req.body.address
     });
 
-    user.save().then((doc) => {
-        res.send(doc);
-    }, (err) => {
-        res.status(400).send(err);
-    })
+    try {
+        const newUser = user.save();
+        res.send(newUser);
+    } catch(error) {
+        res.status(400).send(error);
+    }
+    
 });
 
 app.get('/users', (req, res) => {
@@ -62,14 +64,15 @@ app.delete('/users/:id', async (req, res) => {
         return res.status(404).send("Id is invalid");
     }
 
-    User.findOneAndDelete(id).then((user) => {
+    try {
+        const user = await User.findOneAndDelete(id);
         if (!user) {
            return res.status(404).send();
         }
         res.send({user});
-    }).catch ((e) => {
+    } catch (e) {
         res.status(400).send();
-    });
+    };
 });
 
 app.patch('/users/:id', (req, res) => {
