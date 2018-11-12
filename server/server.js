@@ -13,12 +13,12 @@ let port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
     let user = new User({
-        email: req.body.email,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        address: req.body.address
+        email: escape(req.body.email),
+        firstName: escape(req.body.firstName),
+        lastName: escape(req.body.lastName),
+        address: escape(req.body.address)
     });
 
     user.save().then((doc) => {
@@ -55,7 +55,7 @@ app.get('/users/:id', (req, res) => {
 });
 
 
-app.delete('/users/:id', (req, res) => {
+app.delete('/users/:id', async (req, res) => {
     let id = req.params.id;
 
     if (!ObjectId.isValid(id)) {
