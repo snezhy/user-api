@@ -43,9 +43,30 @@ app.get('/users/:id', (req, res) => {
     }
 
     User.findById(id).then((user) => {
-        (user) ? res.send({user}) : res.send.status(404).send();
+        if (!user) {
+            return res.status(404).send();
+         }
+         res.send({user});
     }).catch ((e) => {
         res.status(400).send(e);
+    });
+});
+
+
+app.delete('/users/:id', (req, res) => {
+    let id = req.params.id;
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(404).send("Id is invalid");
+    }
+
+    User.findOneAndDelete(id).then((user) => {
+        if (!user) {
+           return res.status(404).send();
+        }
+        res.send({user});
+    }).catch ((e) => {
+        res.status(400).send();
     });
 });
 

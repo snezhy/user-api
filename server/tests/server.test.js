@@ -105,8 +105,6 @@ describe('GET /users/:id', () => {
             .end(done);
     });
 
-
-// TODO: check why the following fails
     it('should return 404 if user not found', (done) => {
         let hexId = new ObjectID().toHexString();
     
@@ -116,12 +114,52 @@ describe('GET /users/:id', () => {
           .end(done);
       });
 
-
     it("should return 404 for non-object id", (done) => {
 
         request(app)
         .get('/users/123')
         .expect(404)
         .end(done);
-    })
+    });
+});
+
+describe('DELETE /users/:id', () => {
+    it('should remove a user', (done) => {
+        let hexId = users[0]._id.toHexString();
+
+        request(app)
+            .delete(`/users/${hexId}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.user._id).toBe(hexId);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(hexId).then((user) => {
+                    expect(user).not.toBeTruthy();
+                    done();
+                }).catch ((e) => done(e));
+            });
+    });
+
+
+    it('should return 404 if user not found', (done) => {
+        let hexId = new ObjectID().toHexString();
+    
+        request(app)
+          .delete(`/users/5be919007cc8be2156b3a773`)
+          .expect(404)
+          .end(done);
+    });
+
+    it('should return 404 if object id is not valid', (done) => {
+        
+        request(app)
+        .delete('/users/123')
+        .expect(404)
+        .end(done);
+    });
 });
