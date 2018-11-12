@@ -13,7 +13,7 @@ let port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
     let user = new User({
         email: escape(req.body.email),
         firstName: escape(req.body.firstName),
