@@ -4,27 +4,9 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {User} = require('./../models/user');
+const {users, populateUsers} = require('./seed/seed');
 
-const users = [{
-    _id: new ObjectID(),
-    email: 'email_one@test.com',
-    firstName: 'FirstNameOne',
-    lastName: 'LastNameOne',
-    address: "1 Dream Lane"
-}, {
-    _id: new ObjectID(),
-    email: 'email_two@test.com',
-    firstName: 'FirstNameTwo',
-    lastName: 'LastNameTwo',
-    address: "2 Dream Lane"
-}];
-
-beforeEach((done) => {
-    User.deleteMany({}).then(() => {
-      return User.insertMany(users);
-    }).then(() => done());
-});
-   
+beforeEach(populateUsers);   
 
 describe('POST /users', () => {
     it("should create a new user", (done) => {
