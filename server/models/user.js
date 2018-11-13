@@ -13,7 +13,7 @@ let UserSchema = new Schema({
         validate: {
             validator: validator.isEmail,
             message: '{VALUE} is not a valid email'
-        }
+        },
     },
     firstName: {
         type: String,
@@ -30,6 +30,8 @@ let UserSchema = new Schema({
         required: true,
         trim: true
     }, 
+}, {
+    timestamps: true
 });
 
 UserSchema.plugin(uniqueValidator);
