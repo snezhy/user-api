@@ -2,7 +2,7 @@ require('./config/config');
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
-const {ObjectId} = require('mongodb'); 
+const {ObjectID} = require('mongodb'); 
 
 let {mongoose} = require('./db/mongoose');
 let {User} = require('./models/user');
@@ -42,7 +42,7 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
     let id = req.params.id;
     
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectID.isValid(id)) {
         return res.status(404).send("Id is invalid");
     }
 
@@ -61,7 +61,7 @@ app.get('/users/:id', async (req, res) => {
 app.delete('/users/:id', async (req, res) => {
     let id = req.params.id;
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectID.isValid(id)) {
         return res.status(404).send("Id is invalid");
     }
 
@@ -76,26 +76,25 @@ app.delete('/users/:id', async (req, res) => {
     };
 });
 
-app.patch('/users/:id',  async (req, res) => {
+app.patch('/users/:id', async (req, res) => {
     let id = req.params.id;
 
     let body = _.pick(req.body, ['email', 'firstName', 'lastName', 'address']);
 
-    if (!ObjectId.isValid(id)) {
+    if (!ObjectID.isValid(id)) {
         return res.status(404).send("Id is invalid");
     }
 
     try {
-        const user = await User.findOneAndUpdate(id, {$set: body}, {new: true});
+        const user = await User.findOneAndUpdate({_id: id}, {$set: body}, {new: true}); 
         if (!user) {
           return res.status(404).send();
         }
-  
+
         res.send({user});
       } catch (e) {
-        res.status(400).send();
+        res.status(400).send(e);
     }
-
 });
 
 app.listen(port, () => {
