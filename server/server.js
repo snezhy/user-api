@@ -22,38 +22,39 @@ app.post('/users', async (req, res) => {
     });
 
     try {
-        const newUser = user.save();
+        const newUser = await user.save();
         res.send(newUser);
-    } catch(error) {
-        res.status(400).send(error);
+    } catch (e) {
+        res.status(400).send(e);
     }
-    
 });
 
-app.get('/users', (req, res) => {
-    User.find().then((users) => {
+app.get('/users', async (req, res) => {
+    try {
+        const users = await User.find();
         res.send({users});
-    }, (err) => {
-        res.status(400).send(err);
-    });
+    } catch (e)  {
+        res.status(400).send(e);
+    };
 });
 
 
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res) => {
     let id = req.params.id;
     
     if (!ObjectId.isValid(id)) {
         return res.status(404).send("Id is invalid");
     }
 
-    User.findById(id).then((user) => {
+    try {
+        const user = await User.findById(id);
         if (!user) {
             return res.status(404).send();
          }
          res.send({user});
-    }).catch ((e) => {
+    } catch (e) {
         res.status(400).send(e);
-    });
+    };
 });
 
 
@@ -65,7 +66,7 @@ app.delete('/users/:id', async (req, res) => {
     }
 
     try {
-        const user = await User.findOneAndDelete(id);
+        const user = await User.findByIdAndDelete(id);
         if (!user) {
            return res.status(404).send();
         }
@@ -75,7 +76,7 @@ app.delete('/users/:id', async (req, res) => {
     };
 });
 
-app.patch('/users/:id', (req, res) => {
+app.patch('/users/:id',  async (req, res) => {
     let id = req.params.id;
 
     let body = _.pick(req.body, ['email', 'firstName', 'lastName', 'address']);
@@ -84,17 +85,18 @@ app.patch('/users/:id', (req, res) => {
         return res.status(404).send("Id is invalid");
     }
 
-    User.findOneAndUpdate(id, {$set: body}, {new: true}).then((user) => {
+    try {
+        const user = await User.findOneAndUpdate(id, {$set: body}, {new: true});
         if (!user) {
           return res.status(404).send();
         }
   
         res.send({user});
-      }).catch ((e) => {
+      } catch (e) {
         res.status(400).send();
-    })
+    }
 
-} )
+});
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
