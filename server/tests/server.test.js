@@ -4,27 +4,9 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {User} = require('./../models/user');
+const {users, populateUsers} = require('./seed/seed');
 
-const users = [{
-    _id: new ObjectID(),
-    email: 'email_one@test.com',
-    firstName: 'FirstNameOne',
-    lastName: 'LastNameOne',
-    address: "1 Dream Lane"
-}, {
-    _id: new ObjectID(),
-    email: 'email_two@test.com',
-    firstName: 'FirstNameTwo',
-    lastName: 'LastNameTwo',
-    address: "2 Dream Lane"
-}];
-
-beforeEach((done) => {
-    User.deleteMany({}).then(() => {
-      return User.insertMany(users);
-    }).then(() => done());
-});
-   
+beforeEach(populateUsers);   
 
 describe('POST /users', () => {
     it("should create a new user", (done) => {
@@ -38,6 +20,7 @@ describe('POST /users', () => {
             .send({email, firstName, lastName, address})
             .expect(200)
             .expect((res) => {
+               
                 expect(res.body.email).toBe(email);
                 expect(res.body.firstName).toBe(firstName);
                 expect(res.body.lastName).toBe(lastName);
